@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Speed Detection</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            margin: 0;
+        }
+        #video-column {
+            flex: 1;
+        }
+        #detected-car{
+            width: 10%;
+            max-width: 100px;
+
+        }
+        #options-column {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+        img {
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #333;
+            margin-top: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-column">
+        <h1>Vehicle Speed Detection</h1>
+        <img src="{{ url_for('video') }}" alt="Vehicle Speed Detection">
+    </div>
+    <div id="options-column">
+        <form action="/speed" method="post">
+            <label for="video_source">Choose a video source:</label>
+            <select name="video_source" id="video_source">
+                <option value="-1">Video Sample</option>
+                <option value="0">Camera 0</option>
+                <option value="1">Camera 1</option>
+                <!-- Add more options as needed -->
+            </select>
+            <br>
+            <label for="pixel_per_meter">Distance Between Lines (meters):</label>
+            <input type="number" name="pixel_per_meter" value="4" min="1" step="1">
+            <br>
+            <input type="submit" value="Start Detection">
+           <br>
+            <p>Detected Vehicle</p>
+            <img id="detected-car" alt="Detected Car" width="10px">
+            <p id="detected-speed">Speed: {{ car_speed }} kmph</p>   </div>
+        </form>
+    </div>
+
+    <script>
+        function updateCarData() {
+            fetch('/get_car_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('detected-car').src = data.car_image_url + data.car_speed + '.jpg' || '';
+                    document.getElementById('detected-speed').textContent = 'Speed: ' + data.car_speed + ' kmph';
+                });
+        }
+
+        setInterval(updateCarData, 1000); // Update every second
+    </script>
+</body>
+</html>
